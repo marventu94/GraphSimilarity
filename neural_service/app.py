@@ -1,7 +1,10 @@
 from flask import Flask, jsonify, request
-from model import predict_similarity
+from model import predict_similarity, initialization_model
 
 app = Flask(__name__)
+
+# Inicializar model y triples_factory en el momento que se ejecuta el microservicio
+initialization_model()
 
 @app.route('/process', methods=['POST'])
 def process():
