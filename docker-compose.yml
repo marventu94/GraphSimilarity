@@ -1,0 +1,64 @@
+version: "3.9"
+
+networks:
+  internal_network:
+    driver: bridge
+
+services:
+  auth_service:
+    build:
+      context: ./auth_service
+    image: auth_service_image
+    container_name: auth_service
+    ports:
+      - "5000:5000"
+    networks:
+      - internal_network
+    environment:
+      - LOGGER_SERVICE_URL=http://logger_service:5002/log-and-process
+
+  logger_service:
+    build:
+      context: ./logger_service
+    image: logger_service_image
+    container_name: logger_service
+    command: python3 app.py
+    ports:
+      - "5002:5002"
+    networks:
+      - internal_network
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - CACHE_SERVICE_URL=http://cache_service:5001/detect-similarity
+
+  cache_service:
+    build:
+      context: ./cache_service
+    image: cache_service_image
+    container_name: cache_service
+    environment:
+      - REDIS_HOST=redis
+      - NEURAL_SERVICE_URL=http://neural_service:5003/process
+    networks:
+      - internal_network
+
+  neural_service:
+    build:
+      context: ./neural_service
+    image: neural_service_image
+    container_name: neural_service
+    command: bash -c "cd /app && python3 app.py"
+    ports:
+      - "5003:5003"
+    networks:
+      - internal_network
+
+  redis:
+    image: redis:7
+    container_name: redis-gs
+    ports:
+      - "6379:6379"
+    networks:
+      - internal_network
+    command: ["redis-server"]

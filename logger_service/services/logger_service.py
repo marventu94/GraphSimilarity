@@ -25,5 +25,4 @@ class LoggerService:
         self.logger.info(f"Request received - User: {username}, Inputs: {inputs}, Start Time: {start_time}")
 
     def log_exit(self, username, inputs,response , start_time, end_time):
-        #self.logger.info(f"Request processed - User: {username}, Inputs: {inputs}, Start Time: {start_time}, End Time: {end_time}")
         self.logger.info(f"Request processed - User: {username}, Inputs: {inputs}, Response: {response.json()} Start Time: {start_time}, End Time: {end_time}")

@@ -37,9 +37,15 @@ El sistema está compuesto por varios microservicios, donde el **Microservicio d
 2. **Despliegue en una VPC (Virtual Private Cloud)**: Embeber todos los microservicios dentro de una VPC y configurar un túnel de red para que únicamente 
 el microservicio de autenticación tenga salida a internet. Esto asegura que solo los usuarios autenticados puedan acceder al sistema.
 
-### Registros de Aplicación (Logs)
+### Aclaraciones de Testing
+
+## Registros de Aplicación (Logs)
 
 Se guardan en la carpeta logs y el archivo se llama service.log
+
+## Postman Collection
+
+Se incluye una colección de Postman denominada `GraphSimilarity.postman_collection.json` para facilitar la realización de pruebas de forma rápida y eficiente.
 
 
 ## Configuración y Ejecución del Proyecto
@@ -72,7 +78,32 @@ Estos usuarios se pueden utilizar para obtener una API Key y realizar pruebas de
 
 ### Instrucciones para Levantar el Proyecto
 
-#### 1. Levantar Redis usando Docker
+### Utilizando Docker compose
+
+Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
+
+1. **Construir las imágenes necesarias**  
+   Ejecuta el siguiente comando para generar las imágenes necesarias para el proyecto:
+
+   ```bash
+   docker-compose build
+   ```
+
+2. **Iniciar los microservicios**
+   Una vez generadas las imágenes, levanta todos los microservicios junto con sus dependencias ejecutando:
+   
+   ```bash
+   docker-compose up
+   ```
+3. **Detener contenedores y eliminar imagenes**
+   Si necesitas limpiar las imágenes creadas, ejecuta el siguiente comando:
+  
+  ```bash
+   docker rmi auth_service_image logger_service_image cache_service_image neural_service_image
+   ```
+### Opcion sin Docker Compose
+
+##### 1. Levantar Redis usando Docker
 
 Este proyecto utiliza Redis como sistema de caché. Para iniciar Redis, ejecuta:
 
@@ -86,7 +117,7 @@ Para detenerlo:
 docker stop redis
 ```
 
-#### 2. Instalar Dependencias
+##### 2. Instalar Dependencias
 
 En la raíz del proyecto, instala las dependencias de Python listadas en requirements.txt:
 
@@ -94,7 +125,7 @@ En la raíz del proyecto, instala las dependencias de Python listadas en require
 pip install -r requirements.txt
 ```
 
-#### 3. Iniciar los Microservicios
+##### 3. Iniciar los Microservicios
 
 Cada microservicio se ejecuta independientemente para manejar distintas funciones:
 
@@ -108,9 +139,9 @@ Para iniciar cada microservicio, ejecuta los siguientes comandos en la raíz del
 ```
 python3 auth_service/app.py
 
-python3 cache_service/app.py
-
 python3 logger_service/app.py
 
-python3 neural_service/app.py
+python3 cache_service/app.py
+
+cd neural_service && python3 app.py
 ```

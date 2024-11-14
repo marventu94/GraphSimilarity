@@ -46,7 +46,7 @@ def detect_similarity():
         return jsonify({"message": "Invalid token"}), 403
 
     # URL del microservicio de logger que luego deriva para realizar la consulta del cleinte
-    target_url = app.config['TARGET_URL']
+    target_url = app.config['LOGGER_SERVICE_URL']
 
     try:
         # Realizamos la solicitud HTTP al microservicio de cache
@@ -59,4 +59,4 @@ def detect_similarity():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
