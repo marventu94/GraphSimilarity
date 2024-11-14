@@ -30,19 +30,24 @@ def log_and_process():
 
         # Hacer la solicitud al microservicio de cache
         response = requests.post(cache_url, json={"inputs": inputs})
+
+        if response.status_code != 200:
+            return jsonify({"message": "The service is not responding as expected", "error": response.reason}), 500    
         
         # Registrar la hora de salida
         end_time = datetime.now().strftime(app.config['DATE_FORMAT'])
-        
+
+                
         # Registrar el log de salida
         logger_service.log_exit(username, inputs, response, start_time, end_time)
 
         # Devolver la respuesta del microservicio de cache
         return jsonify(response.json()), response.status_code
+        
     except requests.exceptions.RequestException as e:
         return jsonify({"message": "Error connecting to cache service", "error": str(e)}), 500
 
 if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    app.run(debug=True, port=5002)
+    app.run(debug=True, host='0.0.0.0', port=5002)

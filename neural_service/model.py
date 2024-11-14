@@ -2,6 +2,7 @@ import torch
 from pykeen.triples import TriplesFactory
 import pandas as pd
 import numpy as np
+import os
 
 # Declaración de variables globales
 model = None
@@ -10,12 +11,16 @@ data_frame = None
 
 # Función para cargar el modelo y la fábrica de triples al inicio
 def initialization_model():
-    global model, triples_factory
+    #cwd = os.getcwd()  # Get the current working directory (cwd)
+    #files = os.listdir(cwd)  # Get all the files in that directory
+    #print("Files in %r: %s" % (cwd, files))
+
+    global model, triples_factory, data_frame
     # Carga el modelo
-    model = torch.load('models/inmuebles_grupo_02/trained_model.pkl')
+    model = torch.load('model/transH_model.pkl')
     
     # Carga el TriplesFactory
-    triples_file = 'dataset/dataset_validation.tsv.gz'
+    triples_file = 'model/dataset.tsv.gz'
     triples_factory = TriplesFactory.from_path(triples_file, create_inverse_triples=True)
 
     # A partir de la triplefactory creo dos input
@@ -26,6 +31,16 @@ def initialization_model():
 def predict_similarity(inputs):
     heads = _findHeadOnDataFrame(inputs[0])
     tails = _findHeadOnDataFrame(inputs[1])
+
+    print(len(heads))
+    print(len(tails))
+
+
+    if len(heads) == 0 or len(tails) == 0:
+        raise Exception("Failed to extract knowledge from the provided properties. Propierties 1: {}, Propierties 2: {}".format(len(heads),len(tails)))
+    
+    if len(heads) > 100 or len(tails) > 100:
+        raise Exception("Too many occurrences.. Propierties 1: {}, Propierties 2: {}".format(len(heads),len(tails)))
 
     heads_idx = [triples_factory.entity_to_id[head] for head in heads]
     tails_idx = [triples_factory.entity_to_id[head] for head in tails]
@@ -53,14 +68,13 @@ def predict_similarity(inputs):
 
     # Tomar la decisión basada en el score promedio
     if average_score < threshold:
-        message = "Los atributos cumplen con la condición 'sameAs'."
+        message = "Los atributos cumplen con la condición 'sameAs'"
     else:
-        message = "Los atributos NO cumplen con la condición 'sameAs'."
+        message = "Los atributos NO cumplen con la condición 'sameAs'"
 
     probabilidad = 1 / (1 + np.exp(-average_score))
 
-    return {"probabilidad": probabilidad, "description" : message}
-
+    return  {"probabilidad": probabilidad, "description" : message}
 
 def _findHeadOnDataFrame(properties):
     heads_filtrados = set(data_frame['head'])  # Inicializar con todos los heads posibles
@@ -75,5 +89,4 @@ def _findHeadOnDataFrame(properties):
         ]['head'].unique()
 
         heads_filtrados = heads_filtrados.intersection(heads_filtrados_prop)
-        
     return heads_filtrados
