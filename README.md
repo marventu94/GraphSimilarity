@@ -31,17 +31,32 @@ Para una solicitud que evalúa la similitud de subgrafos, el resultado esperado 
 ```
 ### Aclaraciones técnicas
 
-El sistema está compuesto por varios microservicios, donde el **Microservicio de Autenticación** actúa como la puerta de entrada al servicio. Este microservicio es responsable de la autenticación y autorización de los usuarios mediante una API Key. Los demás microservicios (logger, caché y modelo de redes neuronales) no cuentan con protección adicional de acceso, por lo que existen dos opciones de despliegue recomendadas para garantizar la seguridad:
+El sistema está compuesto por varios microservicios, donde el **Microservicio de Autenticación** actúa como la puerta de entrada al servicio. Este microservicio es responsable de la autenticación y autorización de los usuarios mediante una API Key. 
 
-1. **Uso de API Keys Internas**: Asignar una API Key para cada comunicación entre microservicios.
-2. **Despliegue en una VPC (Virtual Private Cloud)**: Embeber todos los microservicios dentro de una VPC y configurar un túnel de red para que únicamente 
-el microservicio de autenticación tenga salida a internet. Esto asegura que solo los usuarios autenticados puedan acceder al sistema.
+Para obtener más información sobre las definiciones de diseño de los microservicios en este proyecto, consulta el archivo [ADR001-microservice-style.md](./ADRs/ADR001-microservice-style.md). Este documento detalla las decisiones arquitectónicas tomadas y las razones detrás de ellas.
+
+### Flujo de comunicación
+
+![Diagrama de Secuencia](./diagrama.jpeg "Representación de las llamadas entre microservicios")
+
+1. El servicio de autenticación recibe la solicitud, verifica que el usuario esté autorizado y que el cuerpo de la solicitud cumpla con el formato esperado.
+2. Se registra la solicitud de entrada en la base de datos a través del microservicio de logger.
+3. La solicitud es derivada al microservicio de caché.
+4. a. El microservicio de caché verifica si la solicitud ya está almacenada. Si es el caso, devuelve la respuesta directamente, evitando un nuevo cálculo por parte de la red neuronal.\n4. b. Si la información no fue procesada previamente o ha pasado demasiado tiempo desde el último cálculo, el microservicio de caché realiza una llamada a la red neuronal para recalcular la probabilidad.
+5. La caché devuelve la respuesta al microservicio de logger.
+6. Logger registra la respuesta final junto con el tiempo total de procesamiento.
+7. Finalmente, el servicio de autenticación responde al cliente con los resultados.
+
+### Aclaraciones de Logs
+
+Los registros de la aplicación se almacenan en una base de datos MongoDB, configurada para operar en el puerto predeterminado (27017). Se recomienda utilizar Mongo Compass para visualizar la información de manera eficiente.
+
 
 ### Aclaraciones de Testing
 
 ## Registros de Aplicación (Logs)
 
-Se guardan en la carpeta logs y el archivo se llama service.log
+Los registros de la aplicación se almacenan en una base de datos MongoDB configurada para operar en el puerto predeterminado (27017). Se recomienda utilizar Mongo Compass para explorar y analizar la información registrada de forma eficiente.
 
 ## Postman Collection
 
@@ -50,11 +65,12 @@ Se incluye una colección de Postman denominada `GraphSimilarity.postman_collect
 
 ## Configuración y Ejecución del Proyecto
 
-Requisitos Previos
+## Requisitos Previos
 
-- Docker: para ejecutar Redis en un contenedor.
-- Python 3: para ejecutar los microservicios.
-- Librerías de Python: especificadas en requirements.txt
+- **Docker**: Necesario para ejecutar Redis y MongoDB en contenedores.
+- **Docker-Compose**: Utilizado para orquestar el inicio de servicios y microservicios.
+- **Python 3**: Requerido para la ejecución de los microservicios.
+- **Librerías de Python**: Especificadas en el archivo `requirements.txt` en cada microservicio
 
 ### Estructura del Proyecto
 
@@ -76,9 +92,7 @@ La plataforma no cuenta con un sistema de registro de usuarios. Sin embargo, exi
 
 Estos usuarios se pueden utilizar para obtener una API Key y realizar pruebas de acceso según el tipo de cuenta.
 
-### Instrucciones para Levantar el Proyecto
-
-### Utilizando Docker compose
+### Instrucciones para Levantar el Proyecto Utilizando Docker compose
 
 Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
 
@@ -101,47 +115,8 @@ Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
   ```bash
    docker rmi auth_service_image logger_service_image cache_service_image neural_service_image
    ```
-### Opcion sin Docker Compose
 
-##### 1. Levantar Redis usando Docker
+## Aclaraciones de Seguridad
 
-Este proyecto utiliza Redis como sistema de caché. Para iniciar Redis, ejecuta:
-
-```
-docker run -d -p 6379:6379 --name redis redis:latest
-```
-
-Para detenerlo:
-
-```
-docker stop redis
-```
-
-##### 2. Instalar Dependencias
-
-En la raíz del proyecto, instala las dependencias de Python listadas en requirements.txt:
-
-```
-pip install -r requirements.txt
-```
-
-##### 3. Iniciar los Microservicios
-
-Cada microservicio se ejecuta independientemente para manejar distintas funciones:
-
-- Servicio de Autenticación: Gestiona la autenticación y autorización mediante API Keys.
-- Servicio de Caché: Verifica y almacena respuestas de baja volatilidad.
-- Servicio de Logger: Registra cada solicitud, incluyendo el tiempo de entrada, salida y usuario.
-- Servicio de Redes Neuronales: Simula la evaluación de similitud entre subgrafos.
-
-Para iniciar cada microservicio, ejecuta los siguientes comandos en la raíz del proyecto:
-
-```
-python3 auth_service/app.py
-
-python3 logger_service/app.py
-
-python3 cache_service/app.py
-
-cd neural_service && python3 app.py
-```
+- No se consideran aspectos de seguridad adicionales, como API Keys internas o redes privadas virtuales (VPC), ya que están fuera del alcance de este trabajo práctico.
+- Tampoco se considerarán usuarios y contraseñas para las bases de datos MongoDB y Redis.
