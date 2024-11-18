@@ -47,16 +47,11 @@ Para obtener más información sobre las definiciones de diseño de los microser
 6. Logger registra la respuesta final junto con el tiempo total de procesamiento.
 7. Finalmente, el servicio de autenticación responde al cliente con los resultados.
 
-### Aclaraciones de Logs
-
-Los registros de la aplicación se almacenan en una base de datos MongoDB, configurada para operar en el puerto predeterminado (27017). Se recomienda utilizar Mongo Compass para visualizar la información de manera eficiente.
-
-
 ### Aclaraciones de Testing
 
 ## Registros de Aplicación (Logs)
 
-Los registros de la aplicación se almacenan en una base de datos MongoDB configurada para operar en el puerto predeterminado (27017). Se recomienda utilizar Mongo Compass para explorar y analizar la información registrada de forma eficiente.
+Se guardan en la carpeta logs y el archivo llamado service.log
 
 ## Postman Collection
 
@@ -67,7 +62,7 @@ Se incluye una colección de Postman denominada `GraphSimilarity.postman_collect
 
 ## Requisitos Previos
 
-- **Docker**: Necesario para ejecutar Redis y MongoDB en contenedores.
+- **Docker**: Necesario para ejecutar Redis en un contenedor.
 - **Docker-Compose**: Utilizado para orquestar el inicio de servicios y microservicios.
 - **Python 3**: Requerido para la ejecución de los microservicios.
 - **Librerías de Python**: Especificadas en el archivo `requirements.txt` en cada microservicio
@@ -119,4 +114,4 @@ Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
 ## Aclaraciones de Seguridad
 
 - No se consideran aspectos de seguridad adicionales, como API Keys internas o redes privadas virtuales (VPC), ya que están fuera del alcance de este trabajo práctico.
-- Tampoco se considerarán usuarios y contraseñas para las bases de datos MongoDB y Redis.
+- Tampoco se considerarán seguridad para el Redis.

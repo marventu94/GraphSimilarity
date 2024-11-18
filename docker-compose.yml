@@ -42,6 +42,8 @@ services:
       - NEURAL_SERVICE_URL=http://neural_service:5003/process
     networks:
       - internal_network
+    depends_on:
+      - redis
 
   neural_service:
     build:
