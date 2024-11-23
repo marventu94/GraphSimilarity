@@ -15,6 +15,12 @@ rate_limiting_service = RateLimitingService()
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+    
     api_key = auth_service.authenticate(data.get("username"), data.get("password"))
     if api_key:
         return jsonify({"api_key": api_key}), 200
@@ -30,14 +36,13 @@ def validate():
 @token_required
 def detect_similarity():
     data = request.json
-
     # Verificar si el cuerpo de la solicitud (data) está presente y si incluye "inputs"
     if not data or "inputs" not in data:
         return jsonify({"message": "Inputs are required"}), 400
 
     inputs = data["inputs"]
 
-     # Decodificar el token JWT para obtener el username
+    # Decodificar el token JWT para obtener el username
     api_key = request.headers.get("Authorization")
     try:
         decoded_token = jwt.decode(api_key, Config.SECRET_KEY, algorithms=[Config.JWT_ALGORITHM])

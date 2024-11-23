@@ -16,6 +16,8 @@ services:
       - internal_network
     environment:
       - LOGGER_SERVICE_URL=http://logger_service:5002/log-and-process
+    depends_on:
+      - mongodb
 
   logger_service:
     build:
@@ -64,3 +66,17 @@ services:
     networks:
       - internal_network
     command: ["redis-server"]
+
+  mongodb:
+    image: mongo:8.0.3-noble
+    container_name: mongodb
+    restart: always
+    #networks:
+    #  - internal_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - "27017:27017"
