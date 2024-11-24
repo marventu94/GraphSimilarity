@@ -21,8 +21,8 @@ class LoggerService:
         # Añadir el handler al logger
         self.logger.addHandler(file_handler)
 
-    def log_entry(self, username, inputs, start_time):
-        self.logger.info(f"Request received - User: {username}, Inputs: {inputs}, Start Time: {start_time}")
+    def log_entry(self, username, input, start_time):
+        self.logger.info(f"Request received - User: {username}, Input: {input}, Start Time: {start_time}")
 
-    def log_exit(self, username, inputs,response , start_time, end_time):
-        self.logger.info(f"Request processed - User: {username}, Inputs: {inputs}, Response: {response.json()} Start Time: {start_time}, End Time: {end_time}")
+    def log_exit(self, username, input,response , start_time, end_time):
+        self.logger.info(f"Request processed - User: {username}, Input: {input}, Response: {response.json()} Start Time: {start_time}, End Time: {end_time}")

@@ -16,6 +16,10 @@ services:
       - internal_network
     environment:
       - LOGGER_SERVICE_URL=http://logger_service:5002/log-and-process
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=rootpassword
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
     depends_on:
       - mongodb
 
@@ -71,8 +75,8 @@ services:
     image: mongo:8.0.3-noble
     container_name: mongodb
     restart: always
-    #networks:
-    #  - internal_network
+    networks:
+      - internal_network
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword

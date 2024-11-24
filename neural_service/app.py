@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from model import predict_similarity, initialization_model
+from model import initialization_model, predict_similarity
 
 app = Flask(__name__)
 
@@ -10,15 +10,15 @@ initialization_model()
 def process():
     data = request.json
 
-    # Verificar si el cuerpo de la solicitud (data) está presente y si incluye "inputs"
-    if not data or "inputs" not in data:
-        return jsonify({"message": "Inputs are required"}), 400
+    # Verificar si el cuerpo de la solicitud (data) está presente y si incluye "input"
+    if not data or "input" not in data:
+        return jsonify({"message": "Input are required"}), 400
 
-    inputs = data["inputs"]
+    intput_entity = data["input"]
 
     try:
         # Llamar al modelo simulado para obtener la probabilidad de similitud
-        response = predict_similarity(inputs)
+        response = predict_similarity(intput_entity)
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"message": "Error connecting to cache service", "error": str(e)}), 500

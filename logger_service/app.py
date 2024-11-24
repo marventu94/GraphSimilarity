@@ -14,10 +14,10 @@ def log_and_process():
     # Extraer datos de la solicitud
     data = request.json
     username = data.get("username")
-    inputs = data.get("inputs")
+    input = data.get("input")
     
-    if not username or not inputs:
-        return jsonify({"message": "Username and inputs are required"}), 400
+    if not username or not input:
+        return jsonify({"message": "Input are required"}), 400
 
     # Llamada al microservicio de cache
     cache_url = app.config['CACHE_SERVICE_URL']
@@ -26,10 +26,10 @@ def log_and_process():
     start_time = datetime.now().strftime(app.config['DATE_FORMAT'])
     try:
         # Registrar el log de entrada
-        logger_service.log_entry(username, inputs, start_time)
+        logger_service.log_entry(username, input, start_time)
 
         # Hacer la solicitud al microservicio de cache
-        response = requests.post(cache_url, json={"inputs": inputs})
+        response = requests.post(cache_url, json={"input": input})
 
         if response.status_code != 200:
             return jsonify({"message": "The service is not responding as expected", "error": response.reason}), 500    
@@ -39,7 +39,7 @@ def log_and_process():
 
                 
         # Registrar el log de salida
-        logger_service.log_exit(username, inputs, response, start_time, end_time)
+        logger_service.log_exit(username, input, response, start_time, end_time)
 
         # Devolver la respuesta del microservicio de cache
         return jsonify(response.json()), response.status_code

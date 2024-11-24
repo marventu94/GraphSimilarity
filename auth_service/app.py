@@ -36,11 +36,11 @@ def validate():
 @token_required
 def detect_similarity():
     data = request.json
-    # Verificar si el cuerpo de la solicitud (data) está presente y si incluye "inputs"
-    if not data or "inputs" not in data:
-        return jsonify({"message": "Inputs are required"}), 400
+    # Verificar si el cuerpo de la solicitud (data) está presente y si incluye "input"
+    if not data or "input" not in data:
+        return jsonify({"message": "Input are required"}), 400
 
-    inputs = data["inputs"]
+    input = data["input"]
 
     # Decodificar el token JWT para obtener el username
     api_key = request.headers.get("Authorization")
@@ -55,7 +55,7 @@ def detect_similarity():
 
     try:
         # Realizamos la solicitud HTTP al microservicio de cache
-        response = requests.post(target_url, json={"inputs": inputs, "username": username})
+        response = requests.post(target_url, json={"input": input, "username": username})
 
         # Retornamos la respuesta
         return jsonify(response.json()), response.status_code
