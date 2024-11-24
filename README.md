@@ -153,9 +153,63 @@ Si es false, el resultado fue calculado por el modelo de red neuronal en tiempo 
 
 Se guardan en la carpeta logs y el archivo llamado `service.log`
 
-## Postman Collection
+## Test HTTP
 
-Se incluye una colección de Postman denominada `GraphSimilarity.postman_collection.json` para facilitar la realización de pruebas de forma rápida y eficiente.
+Se incluye una colección de Postman llamada `GraphSimilarity.postman_collection.json` que permite realizar pruebas del servicio de manera rápida y eficiente. La colección contiene los siguientes métodos:
+
+### 1. Login
+Este endpoint permite autenticar al usuario. Se debe enviar un JSON con las credenciales (`username` y `password`) en el cuerpo de la solicitud. Si las credenciales son válidas, el servicio devuelve un `api_key` que se utiliza para autenticar las solicitudes posteriores.
+
+- **Método**: `POST`  
+- **URL**: `http://localhost:5000/login`  
+- **Ejemplo de cuerpo de solicitud**:
+  ```json
+  {
+      "username": "premium_user",
+      "password": "password456"
+  }
+
+### 2. Validation
+
+Este endpoint verifica la validez de un token generado durante el inicio de sesión. La validación se realiza enviando el `api_key` en el encabezado de la solicitud.
+
+- **Método**: `GET`
+- **URL**: `http://localhost:5000/validate`
+- **Encabezado** requerido:
+
+```json
+Authorization: {{api_key}}
+```
+
+### 3. Detect Similarity Entity
+
+Permite procesar una entidad del grafo a través de su URI para detectar similitudes con otras entidades. Se debe enviar un JSON con el campo `input` que contiene la URI de la entidad.
+
+- **Método**: `POST`
+- **URL**: `http://localhost:5000/detect-similarity`
+- **Ejemplo** de cuerpo de solicitud:
+```json
+{
+    "input": "https://raw.githubusercontent.com/jwackito/csv2pronto/main/ontology/pronto.owl#space_site3_50561744"
+}
+```
+
+### 4. Detect Similarity Entity Id
+
+Similar al método anterior, pero permite procesar la entidad utilizando su ID numérico en lugar de la URI.
+
+- **Método**: `POST`
+- **URL**: `http://localhost:5000/detect-similarity`
+- **Ejemplo** de cuerpo de solicitud:
+```json
+{
+    "input": 106110
+}
+```
+
+### Notas Adicionales
+- La variable `{{api_key}}` debe ser configurada en la colección de Postman después de realizar un login exitoso.
+- Esta colección está diseñada para simplificar las pruebas y validar el correcto funcionamiento de los endpoints del servicio.
 
 
 ## Configuración y Ejecución del Proyecto
@@ -187,28 +241,19 @@ La plataforma no cuenta con un sistema de registro de usuarios. Sin embargo, exi
 
 Estos usuarios se pueden utilizar para obtener una API Key y realizar pruebas de acceso según el tipo de cuenta.
 
-### Instrucciones para Levantar el Proyecto Utilizando Docker compose
+## Pasos para Levantar el Proyecto con Docker Compose
 
-Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
-
-1. **Construir las imágenes necesarias**  
-   Ejecuta el siguiente comando para generar las imágenes necesarias para el proyecto:
+1. **Iniciar los Microservicios**  
+   Después de generar las imágenes necesarias, inicia todos los microservicios junto con sus dependencias ejecutando el siguiente comando:
 
    ```bash
-   docker-compose build
+   docker-compose up -d --build
    ```
 
-2. **Iniciar los microservicios**
-   Una vez generadas las imágenes, levanta todos los microservicios junto con sus dependencias ejecutando:
-   
-   ```bash
-   docker-compose up -d
-   ```
-3. **Detener contenedores y eliminar imagenes**
-   Si necesitas limpiar las imágenes creadas, ejecuta el siguiente comando:
-  
-  ```bash
-  docker-compose down
+2. **Detener Contenedores y Limpiar Imágenes**
+   Si necesitas detener los contenedores y eliminar las imágenes creadas, ejecuta el siguiente comando:
+    ```bash
+   docker-compose down
    ```
 
 ## Consideraciones de Seguridad y Trabajo Futuro
@@ -216,3 +261,4 @@ Sigue estos pasos para levantar el proyecto utilizando Docker Compose:
 - El servicio no incluye un endpoint para el registro de nuevos usuarios en la plataforma.
 - Aspectos de seguridad adicionales, como el uso de API Keys internas o la implementación de redes privadas virtuales (VPC), no fueron considerados, ya que están fuera del alcance de este trabajo práctico.
 - No se han aplicado medidas de seguridad específicas para Redis ni MongoDB en esta versión del proyecto.
+- No se ha implementado la expiración de tokens ni un servicio para su renovación, así como otros mecanismos de seguridad relacionados con la gestión de autenticación. Estos aspectos se consideran trabajo futuro para fortalecer la seguridad del sistema.

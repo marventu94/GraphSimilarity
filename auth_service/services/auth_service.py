@@ -32,7 +32,6 @@ class AuthService:
             {
                 "username": username,
                 "subscription_type": user["subscription_type"],
-                "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
             },
             Config.SECRET_KEY,
             algorithm=Config.JWT_ALGORITHM
