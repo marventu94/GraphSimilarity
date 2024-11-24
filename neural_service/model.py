@@ -14,9 +14,9 @@ relation_same_as_idx = None
 
 # Función para cargar el modelo y la fábrica de triples al inicio
 def initialization_model():
-    global model, triples_factory, data_frame
+    global model, triples_factory, heads, heads_idx, relation_same_as, relation_same_as_idx
     # Carga el modelo
-    model = torch.load('model/transH_model.pkl')
+    model = torch.load('model/transH_model.pkl', weights_only=False)
     
     # Carga el TriplesFactory
     triples_file = 'model/dataset.tsv.gz'
@@ -29,15 +29,14 @@ def initialization_model():
     heads = data_frame[list(map(lambda x: True if ('pronto.owl#space_site' in x) and (len(x.split('#')[1].split('_')) == 3) else False, data_frame['head'].values))]['head'].values
     heads_idx = [triples_factory.entity_to_id[head] for head in heads]
 
-    relation_same_as = ['http://www.w3.org/2002/07/owl#sameAs'] 
+    relation_same_as = 'http://www.w3.org/2002/07/owl#sameAs'
     relation_same_as_idx = triples_factory.relation_to_id[relation_same_as]
 
     return model, triples_factory, heads, heads_idx, relation_same_as, relation_same_as_idx
 
 def predict_similarity(entity_input):
     result = __validate_input(entity_input)
-
-    scores = model.score_t(torch.tensor([[result,5]]))
+    scores = model.score_t(torch.tensor([[result, 5]]))
     top_10_values, top_10_indices = torch.topk(scores, k=scores.size(1), dim=1, largest=False)
     similarity_entities = __get_top_entities(top_10_values, top_10_indices)
     return similarity_entities

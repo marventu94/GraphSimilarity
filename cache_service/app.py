@@ -15,7 +15,7 @@ def detect_similarity():
     input = data.get("input")
     
     # Varificar si input esta formado correctamente
-    if not isinstance(data, dict) or "input" not in data or not isinstance(data["input"], str):
+    if not isinstance(data, dict) or "input" not in data:
         return jsonify({"error": "Invalid body format. Expected {'input': 'string'}"}), 400
     
     # Verificar si la respuesta ya está en cache

@@ -45,7 +45,7 @@ def log_and_process():
         return jsonify(response.json()), response.status_code
         
     except requests.exceptions.RequestException as e:
-        return jsonify({"message": "Error connecting to cache service", "error": str(e)}), 500
+        return jsonify({"message": "Error on cache or neuronal services", "error": str(e)}), 500
 
 if __name__ == '__main__':
     import logging

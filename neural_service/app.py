@@ -21,7 +21,7 @@ def process():
         response = predict_similarity(intput_entity)
         return jsonify(response), 200
     except Exception as e:
-        return jsonify({"message": "Error connecting to cache service", "error": str(e)}), 500
+        return jsonify({"message": "Error to process input", "error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5003)
