@@ -120,7 +120,7 @@ Ambos formatos son compatibles, pero deben cumplir con las siguientes validacion
 
 El servicio devuelve una respuesta en formato JSON con la siguiente estructura:
 
-```json
+```
 {
     "cached": false,
     "result": [
@@ -177,7 +177,7 @@ Este endpoint verifica la validez de un token generado durante el inicio de sesi
 - **URL**: `http://localhost:5000/validate`
 - **Encabezado** requerido:
 
-```json
+```
 Authorization: {{api_key}}
 ```
 
